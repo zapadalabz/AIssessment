@@ -1,48 +1,38 @@
 import logo from './logo.svg';
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState, useEffect } from 'react';
-import { googleLogout, useGoogleLogin } from '@react-oauth/google';
+import { googleLogout } from '@react-oauth/google';
+import jwt_decode from "jwt-decode";
 import axios from 'axios';
+import { Routes, Route } from "react-router-dom";
+import Signin from './components/Signin';
+import Navigation from './components/Navigation';
+
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import NewUser from './components/NewUser';
 
 
 function App() {
-  const href = window.location.href;
 
-  const [ user, setUser ] = useState([]);
+  const [ user, setUser ] = useState(null);
   const [ profile, setProfile ] = useState(null);
 
-  const login = useGoogleLogin({
-      onSuccess: (codeResponse) => setUser(codeResponse),
-      onError: (error) => console.log('Login Failed:', error)
-  });
+ //Check if user has a persistent login in localStorage
+  useEffect(() => {
+    const persistentLogin = localStorage.getItem('userCredential');
+    //console.log(persistentLogin);
+    if (persistentLogin === "new") {
+      //Sign in again
+    }
+    else if(persistentLogin){
+      setUser(persistentLogin);
+      setProfile(jwt_decode(persistentLogin));
+    }
+  },[]);
 
-    useEffect(
-      () => {
-          if (user) {
-              axios
-                  .get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
-                      headers: {
-                          Authorization: `Bearer ${user.access_token}`,
-                          Accept: 'application/json'
-                      }
-                  })
-                  .then((res) => {
-                    //console.log(res);
-                      setProfile(res.data);
-                  })
-                  .catch((err) => console.log(err));
-          }
-      },
-      [ user ]
-  );
-
-  // log out function to log the user out of google and set the profile array to null
-  const logOut = () => {
-    googleLogout();
-    setProfile(null);
-  };
-
-  /*const callBackendAPI = async () => {
+  const callBackendAPI = async () => {
     const response = await fetch('/express_backend');
     const body = await response.json();
 
@@ -52,36 +42,69 @@ function App() {
     console.log(body);
     return body;
   };
-  */
+
+  async function fetchData(){
+    const response = await fetch(`http://localhost:5000/users`)
+      .then(res => res.json())
+      .then(data => console.log(data));
+  }
+
+  async function addUser(){
+    await fetch(`http://localhost:5000/users/update`, {
+     method: "POST",
+     body: JSON.stringify({"name": profile.name, "role": "Teacher", "email": profile.email}),
+     headers: {
+       'Content-Type': 'application/json'
+     },
+   });
+  }
 
   function Profile(){
     return(
       <>
-        {profile ? (
+        {profile && (
           <div>
-              <img src={profile.picture} alt="user image" referrerpolicy="no-referrer"/>
+              <img src={profile.picture} alt="user image" referrerPolicy="no-referrer"/>
               <h3>User Logged in</h3>
               <p>Name: {profile.name}</p>
               <p>Email Address: {profile.email}</p>
-              <br />
-              <br />
-              <button onClick={logOut}>Log out</button>
+              <button onClick={addUser}>ADD</button>
           </div>
-      ) : (
-          <button onClick={() => login()}>Sign in with Google 🚀 </button>
       )}
     </>
     )
   }
 
+  function Content(){
+    if(user){
+      if(user.substring(0,5) === "new: "){
+        return(<NewUser user={user} profile={profile} setUser={setUser} setProfile={setProfile}/>);
+      }
+      else{
+        return(
+          <Container>
+            <Row>
+              <Navigation setUser={setUser} setProfile={setProfile}/>
+            </Row>
+            <Row className='navSpacer'>
+              <Routes>
+                <Route exact path="/" element={<div>Main Page <br/> <Profile/></div>} />
+                <Route path="/Teacher" element={<div>Hello Teacher  <br/> <Profile/> </div>}/>
+              </Routes>
+            </Row>
+          </Container>
+        );
+      }
+    }    
+    else{
+      return(<Signin setUser={setUser} setProfile={setProfile}/>);
+    }
+  }
+
+
   return (
     <div className="App">
-      <h2>AIssessment Login</h2>
-      <br/>
-      {href.includes("localhost")?"Localhost":"Remote Connection"}
-      <br />
-      <br />
-      <Profile/>
+      <Content/>          
     </div>
   );
 }

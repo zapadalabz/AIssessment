@@ -1,5 +1,6 @@
 const { MongoClient } = require("mongodb");
 const Db = process.env.ATLAS_URI;
+console.log(Db);
 const client = new MongoClient(Db, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -8,19 +9,18 @@ const client = new MongoClient(Db, {
 var _db;
  
 module.exports = {
-  connectToServer: function (callback) {
-    client.connect(function (err, db) {
-      // Verify we got a good "db" object
-      if (db)
-      {
-        _db = db.db("aissessment");
-        console.log("Successfully connected to MongoDB."); 
+  connectToServer: async function (callback) {
+    try {
+        await client.connect();
+      } catch (e) {
+        console.error(e);
       }
-      return callback(err);
-         });
-  },
- 
-  getDb: function () {
-    return _db;
-  },
+  
+      _db = client.db("BH");
+      console.log("Connected to Mongo.")
+      return (_db === undefined ? false : true);
+    },
+    getDb: function () {
+      return _db;
+    },
 };
