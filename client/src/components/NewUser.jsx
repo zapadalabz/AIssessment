@@ -2,19 +2,21 @@ import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import {Button} from "react-bootstrap";
 import { googleLogout } from '@react-oauth/google';
+import { addUser } from "../scripts/mongo";
 
 export default function NewUser({user, profile, setUser, setProfile}){
 
-    async function addUser(role){
-        const response = await fetch(`http://localhost:5000/users/update`, {
-            method: "POST",
-            body: JSON.stringify({"name": profile.name, "role": role, "email": profile.email}),
-            headers: {
-            'Content-Type': 'application/json'
-            },
-        });      
-    }
-
+  function initNewUser(role){
+    addUser(profile, role).then(()=>{
+      setUser(user.substring(5));
+      localStorage.setItem('userCredential',user.substring(5));
+    });
+    let tempUser = profile;
+    tempUser['role'] = role;
+    localStorage.setItem('userRole',role);
+    setProfile(tempUser);
+  }
+    
     const logOut = () => {
         googleLogout();
         setProfile(null);
@@ -34,8 +36,8 @@ export default function NewUser({user, profile, setUser, setProfile}){
                   <br />
                   {profile.hd === "branksome.on.ca"?
                   <>
-                    <Button variant = "primary" onClick={() => addUser('Student')} className="mx-2">Student</Button>
-                    <Button variant = "success" onClick={() => addUser('Teacher')} className="mx-2">Teacher</Button>
+                    <Button variant = "primary" onClick={() => initNewUser('Student')} className="mx-2">Student</Button>
+                    <Button variant = "success" onClick={() => initNewUser('Teacher')} className="mx-2">Teacher</Button>
                   </>
                   :
                   <p>Sorry but this service is only available to Branksome Hall users at the moment.</p>                  

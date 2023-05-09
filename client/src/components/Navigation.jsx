@@ -1,7 +1,7 @@
 import { Navbar, Nav, Container } from 'react-bootstrap';
 import { googleLogout } from '@react-oauth/google';
 
-const Navigation = ({setUser, setProfile}) => {
+const Navigation = ({profile, setUser, setProfile}) => {
 
     const logOut = () => {
         googleLogout();
@@ -19,10 +19,13 @@ const Navigation = ({setUser, setProfile}) => {
                 <Navbar.Collapse id='responsive-navbar-nav'>
                     <Nav className="container-fluid">
                         <Nav.Item>
-                            <Nav.Link href='/Teacher'>Teacher</Nav.Link>
+                            <Nav.Link href='/'>{profile.role}</Nav.Link>
                         </Nav.Item>
                         <Nav.Item>
-                            <Nav.Link href='/'>Student</Nav.Link>
+                            <Nav.Link href='/TaskList'>View Tasks</Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item>
+                            <Nav.Link href='/CreateTask'>Create Task</Nav.Link>
                         </Nav.Item>
                         
                         <Nav.Item className='ms-auto'>

@@ -11,21 +11,18 @@ app.use(require("./routes/record"));
 
 const dbo = require("./db/conn");
 
+
 app.use(express.static(path.join(__dirname, 'client/build')));
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname+'/client/build/index.html'));
 });
 
+
 // This displays message that the server running and listening to specified port
 app.listen(port, async () => {
     console.log(`Listening on port ${port}`);
     await dbo.connectToServer(function (err) {
-        if (err) console.errorr(err);
+        if (err) console.error(err);
     });    
     console.log(`Server is running on port: ${port}`);
 }); //Line 6
-
-// create a GET route
-app.get('/express_backend', (req, res) => { //Line 9
-  res.send({ express: 'YOUR EXPRESS BACKEND IS CONNECTED TO REACT' }); //Line 10
-}); //Line 11

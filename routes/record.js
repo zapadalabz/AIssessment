@@ -26,7 +26,7 @@ recordRoutes.route("/users").get(async function (req, response) {
   
   });
 
-  // This section will help you get a list of all the records.
+  // Check if User Exists(ie. needs to make an account)
 recordRoutes.route("/userExists/:email").get(async function (req, response) {
     let db_connect = dbo.getDb();
     let myquery = { email: req.params.email };
@@ -44,7 +44,7 @@ recordRoutes.route("/userExists/:email").get(async function (req, response) {
 recordRoutes.route("/users/update").post(async function (req, response) {
     let db_connect = dbo.getDb();
 
-    let myquery = {"email": req.body.email}; //users have a unique email
+    let myquery = {email: req.body.email}; //users have a unique email
 
     let myobj = {$set:{
         name: req.body.name,
@@ -54,11 +54,8 @@ recordRoutes.route("/users/update").post(async function (req, response) {
 
     let options = {upsert : true};
 
-    db_connect.collection("User").updateOne(myquery, myobj, options, function(err, res) {
-        if (err) throw err;
-        console.log("updated");
-        response.json(res);
-    });
+    let result = await db_connect.collection("User").updateOne(myquery, myobj, options);
+    response.send(result).status(204);
 });
 
 module.exports = recordRoutes;

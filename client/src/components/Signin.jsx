@@ -19,15 +19,17 @@ export default function Signin({setUser, setProfile}){
                     <br/>
                     <GoogleLogin
                         onSuccess={credentialResponse => {
-                        //console.log(jwt_decode(credentialResponse.credential));
-                        const tempUser = jwt_decode(credentialResponse.credential);
-                        setProfile(tempUser);                        
+                        let tempUser = jwt_decode(credentialResponse.credential);              
                         userExists(tempUser.email).then( (resp) => {
                             if(resp){
+                                tempUser['role'] = resp.role;
+                                setProfile(tempUser);
                                 setUser(credentialResponse.credential);                        
                                 localStorage.setItem('userCredential',credentialResponse.credential);
+                                localStorage.setItem('userRole',resp.role);
                             }
                             else{
+                                setProfile(tempUser);
                                 setUser("new: "+credentialResponse.credential);
                             }
                         });

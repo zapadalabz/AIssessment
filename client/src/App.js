@@ -12,7 +12,10 @@ import Navigation from './components/Navigation';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import NewUser from './components/NewUser';
-
+import CreateTask from './components/CreateTasks';
+import TaskList from './components/TaskList';
+import TeacherHome from './components/TeacherHome';
+import StudentHome from './components/StudentHome';
 
 function App() {
 
@@ -22,13 +25,16 @@ function App() {
  //Check if user has a persistent login in localStorage
   useEffect(() => {
     const persistentLogin = localStorage.getItem('userCredential');
+    const persistentRole = localStorage.getItem('userRole');
     //console.log(persistentLogin);
     if (persistentLogin === "new") {
       //Sign in again
     }
     else if(persistentLogin){
       setUser(persistentLogin);
-      setProfile(jwt_decode(persistentLogin));
+      let tempUser = jwt_decode(persistentLogin);
+      tempUser['role'] = persistentRole;
+      setProfile(tempUser);
     }
   },[]);
 
@@ -49,16 +55,6 @@ function App() {
       .then(data => console.log(data));
   }
 
-  async function addUser(){
-    await fetch(`http://localhost:5000/users/update`, {
-     method: "POST",
-     body: JSON.stringify({"name": profile.name, "role": "Teacher", "email": profile.email}),
-     headers: {
-       'Content-Type': 'application/json'
-     },
-   });
-  }
-
   function Profile(){
     return(
       <>
@@ -68,11 +64,22 @@ function App() {
               <h3>User Logged in</h3>
               <p>Name: {profile.name}</p>
               <p>Email Address: {profile.email}</p>
-              <button onClick={addUser}>ADD</button>
           </div>
       )}
     </>
     )
+  }
+
+  function HomePage(){
+    if(profile.role === "Student"){
+      return <StudentHome/>
+    } else if (profile.role === "Teacher"){
+      return <TeacherHome/>
+    }else {
+      return (<>
+      <h1>Unknown Role</h1>
+      </>)
+    }
   }
 
   function Content(){
@@ -84,12 +91,13 @@ function App() {
         return(
           <Container>
             <Row>
-              <Navigation setUser={setUser} setProfile={setProfile}/>
+              <Navigation profile={profile} setUser={setUser} setProfile={setProfile}/>
             </Row>
             <Row className='navSpacer'>
               <Routes>
-                <Route exact path="/" element={<div>Main Page <br/> <Profile/></div>} />
-                <Route path="/Teacher" element={<div>Hello Teacher  <br/> <Profile/> </div>}/>
+                <Route exact path="/" element={<HomePage/>} />
+                <Route path="/CreateTask" element= {<CreateTask/>} />
+                <Route path="/TaskList" element={<TaskList/>}/>
               </Routes>
             </Row>
           </Container>
