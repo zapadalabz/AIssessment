@@ -1,5 +1,8 @@
+const PROXY = process.env.PROXY || "http://localhost:5000"; 
+
 async function userExists(email){
-    const response = await fetch(`http://localhost:5000/userExists/${email}`)
+    console.log(PROXY);
+    const response = await fetch(`${PROXY}/userExists/${email}`)
 
     const output = await response.json();
     
@@ -12,7 +15,7 @@ async function userExists(email){
 }
 
 async function addUser(profile, role){
-    const response = await fetch(`http://localhost:5000/users/update`, {
+    const response = await fetch(`${PROXY}/users/update`, {
         method: "POST",
         body: JSON.stringify({"name": profile.name, "role": role, "email": profile.email}),
         headers: {
