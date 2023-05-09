@@ -1,7 +1,6 @@
-const PROXY = process.env.PROXY || "http://localhost:5000"; 
+import { PROXY } from "../config";
 
 async function userExists(email){
-    console.log(PROXY);
     const response = await fetch(`${PROXY}/userExists/${email}`)
 
     const output = await response.json();
