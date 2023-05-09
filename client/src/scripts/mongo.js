@@ -1,4 +1,4 @@
-import { PROXY } from "../etc/secrets/config";
+import { PROXY } from "./config";
 
 async function userExists(email){
     const response = await fetch(`${PROXY}/userExists/${email}`)
