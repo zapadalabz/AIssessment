@@ -96,8 +96,8 @@ function App() {
             <Row className='navSpacer'>
               <Routes>
                 <Route exact path="/" element={<HomePage/>} />
-                <Route path="/CreateTask" element= {<CreateTask/>} />
-                <Route path="/TaskList" element={<TaskList/>}/>
+                <Route path="/CreateTask" exact element= {<CreateTask/>} />
+                <Route path="/TaskList" exact element={<TaskList/>}/>
               </Routes>
             </Row>
           </Container>
