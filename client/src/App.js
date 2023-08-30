@@ -16,6 +16,7 @@ import CreateTask from './components/CreateTasks';
 import TaskList from './components/TaskList';
 import TeacherHome from './components/TeacherHome';
 import StudentHome from './components/StudentHome';
+import Playground from './components/Playground';
 
 function App() {
 
@@ -98,6 +99,7 @@ function App() {
                 <Route exact path="/" element={<HomePage/>} />
                 <Route path="/CreateTask" exact element= {<CreateTask/>} />
                 <Route path="/TaskList" exact element={<TaskList/>}/>
+                <Route path="/Playground" exact element={<Playground/>}/>
               </Routes>
             </Row>
           </Container>

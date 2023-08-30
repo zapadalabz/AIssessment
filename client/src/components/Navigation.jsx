@@ -27,7 +27,10 @@ const Navigation = ({profile, setUser, setProfile}) => {
                         <Nav.Item>
                             <Nav.Link href='/CreateTask'>Create Task</Nav.Link>
                         </Nav.Item>
-                        
+                        <Nav.Item>
+                            <Nav.Link href='/Playground'>Playground</Nav.Link>
+                        </Nav.Item>
+
                         <Nav.Item className='ms-auto'>
                             <Nav.Link href="/" onClick={logOut}>Sign out</Nav.Link>                         
                         </Nav.Item>
