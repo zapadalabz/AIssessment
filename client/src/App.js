@@ -1,10 +1,11 @@
 import logo from './logo.svg';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import styles from "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
+import './chat.css';
 import React, { useState, useEffect } from 'react';
 import { googleLogout } from '@react-oauth/google';
 import jwt_decode from "jwt-decode";
-import axios from 'axios';
 import { Routes, Route } from "react-router-dom";
 import Signin from './components/Signin';
 import Navigation from './components/Navigation';
@@ -17,6 +18,9 @@ import TaskList from './components/TaskList';
 import TeacherHome from './components/TeacherHome';
 import StudentHome from './components/StudentHome';
 import Playground from './components/Playground';
+import ChatPage from './components/ChatPage';
+import Chat from './components/Chat';
+import ChatTest from './components/ChatTest';
 
 function App() {
 
@@ -100,6 +104,8 @@ function App() {
                 <Route path="/CreateTask" exact element= {<CreateTask/>} />
                 <Route path="/TaskList" exact element={<TaskList/>}/>
                 <Route path="/Playground" exact element={<Playground/>}/>
+                <Route path="/ChatPage" exact element={<ChatTest/>}/>
+                <Route path="/Chat" exact element={<Chat/>}/>
               </Routes>
             </Row>
           </Container>

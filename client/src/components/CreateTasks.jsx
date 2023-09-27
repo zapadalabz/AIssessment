@@ -38,8 +38,6 @@ export default function CreateTask(){
         }
     }
 
-    
-
     const onSubmit = data => console.log(data);
     const handleChange = (e) => {  
         setTogglePreview(false);      
