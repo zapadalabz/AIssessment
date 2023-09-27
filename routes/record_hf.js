@@ -37,7 +37,7 @@ recordHFRoutes.route("/hf/:prompt").get(async function (req, response) {
         response.end();
     } catch (error) {
         console.error(error);
-        response.status(500).send('Error generating text');
+        response.status(500).send(HF_token);
     }
   
   });
