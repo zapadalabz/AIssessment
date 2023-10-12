@@ -14,7 +14,7 @@ const apiVersion = '2023-06-01-preview';
 
 // Azure OpenAI requires a custom baseURL, api-version query param, and api-key header.
 const openai = new OpenAI({
-    OPENAI_KEY,
+    apiKey: OPENAI_KEY,
     baseURL: `https://${OPENAI_RESOURCE}.openai.azure.com/openai/deployments/${model}`,
     defaultQuery: { 'api-version': apiVersion },
     defaultHeaders: { 'api-key': OPENAI_KEY },
