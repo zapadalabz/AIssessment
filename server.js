@@ -1,6 +1,6 @@
 const express = require('express'); //Line 1
 const https = require('https');
-const fs = require('fs');
+//const fs = require('fs');
 const path = require('path');
 const qs = require('qs');
 
@@ -17,10 +17,11 @@ app.use(require("./routes/record_openAI.js"));
 
 const dbo = require("./db/conn");
 
+/*
 const options = {
   key: fs.readFileSync('./private.key'),
   cert: fs.readFileSync('./certificate.crt')
-};
+};*/
 
 
 /**
@@ -90,9 +91,17 @@ async function getProfileData(accessToken) {
   return data;
 }
 
-
+/*
 // This displays message that the server running and listening to specified port
 https.createServer(options, app).listen(port,async () => {
+  console.log(`Listening on port ${port}`);
+    await dbo.connectToServer(function (err) {
+        if (err) console.error(err);
+    });    
+    console.log(`Server is running on port: ${port}`);
+});*/
+
+app.listen(port, async () => {
   console.log(`Listening on port ${port}`);
     await dbo.connectToServer(function (err) {
         if (err) console.error(err);
