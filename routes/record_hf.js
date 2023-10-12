@@ -13,7 +13,6 @@ recordHFRoutes.route("/hf/:prompt").get(async function (req, response) {
     let prompt = req.params.prompt;
     //console.log(prompt);
 
-    console.log(HF_token);
     const hf = new HfInference(HF_token);
     const model = "google/flan-t5-xxl";
     //const maxTokens = 250;
@@ -37,7 +36,7 @@ recordHFRoutes.route("/hf/:prompt").get(async function (req, response) {
         response.end();
     } catch (error) {
         console.error(error);
-        response.status(500).send(HF_token);
+        response.status(500).send('Error generating text');
     }
   
   });

@@ -1,6 +1,7 @@
 import {useState, useRef, useEffect} from "react";
 //import { MessageInput} from "@chatscope/chat-ui-kit-react";
 import { setResponse } from "../scripts/hf";
+import { setOpenAIResponse } from "../scripts/openAI";
 import MessageDisplay from "./Message/MessageDisplay";
 import { extractPDFText } from "../scripts/processFile";
 import MessageInput from "./MessageInput/MessageInput";
@@ -50,7 +51,7 @@ export default function ChatPage() {
       });
       setMessages(temp);
       setMsgInputValue("");
-      setResponse(message, temp, setMessages, running, setRunning, attachText);
+      setOpenAIResponse(message, temp, setMessages, running, setRunning, attachText);
       setAttachText([])      
     }
     inputRef.current.focus();
