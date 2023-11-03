@@ -24,7 +24,6 @@ jobs:
       - name: npm install, node server.js
         run: |
           npm install
-          node server.js
           
       - name: Change directory to 'cd/client'
         run: cd client
