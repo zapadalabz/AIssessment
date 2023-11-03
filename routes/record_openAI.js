@@ -1,6 +1,6 @@
 const express = require("express");
 const OpenAI = require("openai");
-require("dotenv").config({path:"./config.env"});
+require("dotenv").config();
 
 // recordRoutes is an instance of the express router.
 // We use it to define our routes.
@@ -22,14 +22,19 @@ const openai = new OpenAI({
 
 // This section will help you get a list of all the records.
 recordOPENAIRoutes.route("/openAI/:prompt").get(async function (req, response) {
+    console.log("here");
     let prompt = req.params.prompt;
-    //console.log(prompt);
+    let systemMessage = "You are an experienced teacher helping fellow colleagues."
+    let messages = [{"role" : "system", "content" : systemMessage},];
+    let chatHistory = [{ role: 'user', content: prompt }];
+
+    messages = messages.concat(chatHistory);
 
     //console.log('Non-streaming:');
     try {
         const result = await openai.chat.completions.create({
             model,
-            messages: [{ role: 'user', content: prompt }],
+            messages: messages,
         });
         response.write(result.choices[0].message?.content);
         //console.log(result.choices[0].message?.content);
@@ -39,5 +44,81 @@ recordOPENAIRoutes.route("/openAI/:prompt").get(async function (req, response) {
         response.status(500).send('Error generating text');
     }  
   });
+
+  // This section will help you get a list of all the records.
+recordOPENAIRoutes.route("/openAI/chat/:chatHistory").get(async function (req, response) {
+    
+    let systemMessage = "You are an experienced teacher helping fellow colleagues."
+    let messages = [{"role" : "system", "content" : systemMessage},];
+    let chatHistory = JSON.parse(decodeURIComponent(req.params.chatHistory));
+
+    messages = messages.concat(chatHistory);
+    //console.log(messages);
+
+    //console.log('Non-streaming:');
+    try {
+        const result = await openai.chat.completions.create({
+            model,
+            messages: messages,
+        });
+        response.write(result.choices[0].message?.content);
+        //console.log(result.choices[0].message?.content);
+        response.end();
+    } catch (error) {
+        console.error(error);
+        response.status(500).send('Error generating text');
+    }  
+  });
+
+//Post Request
+
+recordOPENAIRoutes.route("/openAI/post").post(async function (req, response) {
+    let systemMessage = "You are an experienced teacher helping fellow colleagues."
+    let messages = [{"role" : "system", "content" : systemMessage},];
+    let prompt = decodeURIComponent(req.body.prompt);
+    //console.log(req.body.prompt);
+    let chatHistory = [{ role: 'user', content: prompt }];
+    //let chatHistory = JSON.parse(decodeURIComponent(req.body.chatHistory));
+
+    messages = messages.concat(chatHistory);
+    //console.log(messages);
+
+    //console.log('Non-streaming:');
+    try {
+        const result = await openai.chat.completions.create({
+            model,
+            messages: messages,
+        });
+        response.write(result.choices[0].message?.content);
+        //console.log(result.choices[0].message?.content);
+        response.end();
+    } catch (error) {
+        console.error(error);
+        response.status(500).send('Error generating text');
+    } 
+});
+
+
+recordOPENAIRoutes.route("/openAI/postChat").post(async function (req, response) {
+    let systemMessage = "You are an experienced teacher helping fellow colleagues."
+    let messages = [{"role" : "system", "content" : systemMessage},];
+    let chatHistory = req.body.chatHistory;
+
+    messages = messages.concat(chatHistory);
+
+    //console.log('Non-streaming:');
+    try {
+        const result = await openai.chat.completions.create({
+            model,
+            messages: messages,
+        });
+        response.write(result.choices[0].message?.content);
+        //console.log(result.choices[0].message?.content);
+        response.end();
+    } catch (error) {
+        console.error(error);
+        response.status(500).send('Error generating text');
+    } 
+});
 
   module.exports = recordOPENAIRoutes;

@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileExcel } from "@fortawesome/free-solid-svg-icons/faFileExcel";
 import { faFilePdf } from "@fortawesome/free-solid-svg-icons/faFilePdf";
 
-export default function MessageDisplay(props){
+const MessageDisplay = (props) => {
     let messages = props.messages;
 
     const AlwaysScrollToBottom = () => {
@@ -18,17 +18,17 @@ export default function MessageDisplay(props){
         <div className="messageListContainer">
             <div className="messageListScrollbar">
                 {messages.map((m, i) =>{
-                    if(m.direction==="incoming"){
+                    if(m.role==="assistant"){
                         return(
                             <div key={i} className="messageIncoming">
-                            <img src={ribbit} alt="ribbitAvatar" className="messageAvatar"></img>
-                            {m.message}
-                        </div> 
+                                <img src={ribbit} alt="ribbitAvatar" className="messageAvatar"></img>
+                                {m.content}
+                            </div> 
                         );
-                    }else if(m.direction==="outgoing"){
+                    }else if(m.role==="user"){
                         return(
                             <div key={i} className="messageOutgoing">
-                                {m.message}
+                                {m.content}
                                 {m.attachments.length>0 ?
                                 <>
                                 <br/><br/>
@@ -42,7 +42,7 @@ export default function MessageDisplay(props){
                     }else{
                         return(
                             <div>
-                                "Something went wrong..."
+                                System Message: {m.content}
                             </div>
                         );
                     }                                     
@@ -53,3 +53,5 @@ export default function MessageDisplay(props){
         </div>
     )
 }
+
+export default MessageDisplay;

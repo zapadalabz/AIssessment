@@ -1,6 +1,6 @@
 const express = require("express");
 const { HfInference } = require('@huggingface/inference');
-require("dotenv").config({path:"./config.env"});
+require("dotenv").config();
 
 // recordRoutes is an instance of the express router.
 // We use it to define our routes.
@@ -40,5 +40,36 @@ recordHFRoutes.route("/hf/:prompt").get(async function (req, response) {
     }
   
   });
+
+recordHFRoutes.route("/hf/post").post(async function (req, response) {
+    let prompt = decodeURIComponent(req.body.prompt);
+    console.log(prompt);
+
+    const hf = new HfInference(HF_token);
+    const model = "google/flan-t5-xxl";
+    //const maxTokens = 250;
+
+    response.setHeader('Content-Type', 'text/plain');
+    response.setHeader('Transfer-Encoding', 'chunked');
+
+    try {
+        for await (const output of hf.textGenerationStream({
+            model,
+            inputs: prompt,
+            parameters: { max_new_tokens: 250 },
+        }, {
+            use_cache: false,
+        })) {
+            // Send each chunk of text immediately to the client
+            response.write(output.token.text);
+        }
+
+        // Signal the end of the response
+        response.end();
+    } catch (error) {
+        console.error(error);
+        response.status(500).send('Error generating text');
+    }
+});
 
   module.exports = recordHFRoutes;

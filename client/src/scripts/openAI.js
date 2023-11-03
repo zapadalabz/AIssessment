@@ -1,6 +1,6 @@
 import { PROXY } from './config';
 
-async function handleStreamedResponseMessages(response, messages, setMessages) {
+async function handleStreamedResponseMessages(response, chatHistory, setChatHistory, lengthChatHistory) {
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let partialText = '';
@@ -19,42 +19,56 @@ async function handleStreamedResponseMessages(response, messages, setMessages) {
 
             // Process the received chunk of text
             partialText += decoder.decode(value);
-            
-            // Assuming you want to display the text in an HTML element with the id "output"
-            //document.getElementById("output").textContent = partialText;
-            //console.log(partialText);
-            
-            //temp[temp.length - 1].message = partialText;
-            //console.log(temp);
-            //setPartial(partialText);
-            messages[messages.length-1].message = partialText.replace("</s>","");
-            setMessages([...messages]);
+
+            chatHistory[lengthChatHistory-1].content = partialText;
+            setChatHistory([...chatHistory]);
         }
-        //console.log(messages);
 
     } catch (error) {
         console.error(error);
     }
 }
 
-export async function setOpenAIResponse(prompt, messages, setMessages, running, setRunning, attachText){
-    //let running = false;
-
-    if (running) {
-        return;
+export async function loopSetChatHistory(setChatHistory){
+    for(let i=0;i<10;i++){
+        setChatHistory(prevChatHistory => [
+            ...prevChatHistory,
+            {
+              content: "message",
+              role: 'user',
+              attachments: []
+            },
+            {
+              content: '',
+              role: 'assistant'
+            }
+          ]);
     }
-    setRunning(true);
-    //append attachText to the prompt
+    return "done";
+}
+
+
+export async function postOpenAIResponse(chatHistory, setChatHistory){
+    const lengthChatHistory = chatHistory.length;
+
+    const chat = chatHistory[lengthChatHistory - 2];
+    //console.log(chatHistory);
+    const prompt = chat.content + chat.attachments.map((text, index) => `\n\ndocument_${index}: \`\`\`${text}\`\`\``).join('');
     try {
-        //console.log(prompt);
-        fetch(`${PROXY}/openAI/${prompt}`)
+        fetch(`${PROXY}/openAI/post`, { 
+            method: "POST",
+            body: JSON.stringify({"prompt": encodeURIComponent(prompt)}),
+            headers: {
+            'Content-Type': 'application/json'
+            },
+        })
             .then((response) => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 return response;
             })
-            .then((response)=>handleStreamedResponseMessages(response, messages, setMessages))
+            .then((response)=>handleStreamedResponseMessages(response, chatHistory, setChatHistory, lengthChatHistory))
             .catch((error) => {
                 console.error('Fetch error:', error);
             });        
@@ -62,7 +76,50 @@ export async function setOpenAIResponse(prompt, messages, setMessages, running, 
     } catch (err) {
         alert("Error: " + err.message);
     } finally {
-        setRunning(false);
+        //nothing
     }
+    
+    return;
+}
+
+
+export async function postOpenAIChatResponse(chatHistory, setChatHistory){
+    const lengthChatHistory = chatHistory.length;
+
+    let msgHistory = []; //Include the attachments into the history
+    for(let i = 0; i < lengthChatHistory-1; i++){
+        let chat = chatHistory[i];
+        if(chat.role === "user"){
+            msgHistory.push({"role" : chat.role, "content" : chat.content + chat.attachments.map((text, index) => `\n\ndocument_${index}: \`\`\`${text}\`\`\``).join('')});
+        }else{
+            msgHistory.push({"role" : chat.role, "content" : chat.content});
+        } 
+    }
+
+    try {
+        fetch(`${PROXY}/openAI/postChat`, { 
+            method: "POST",
+            body: JSON.stringify({"chatHistory": msgHistory}),
+            headers: {
+            'Content-Type': 'application/json'
+            },
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response;
+            })
+            .then((response)=>handleStreamedResponseMessages(response, chatHistory, setChatHistory, lengthChatHistory))
+            .catch((error) => {
+                console.error('Fetch error:', error);
+            });        
+        
+    } catch (err) {
+        alert("Error: " + err.message);
+    } finally {
+        //nothing
+    }
+    
     return;
 }

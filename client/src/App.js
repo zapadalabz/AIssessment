@@ -1,128 +1,80 @@
-import logo from './logo.svg';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import styles from "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
-import './chat.css';
+import './styles/chat.css';
+import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
+
 import React, { useState, useEffect } from 'react';
-import { googleLogout } from '@react-oauth/google';
 import jwt_decode from "jwt-decode";
-import { Routes, Route } from "react-router-dom";
-import Signin from './components/Signin';
-import Navigation from './components/Navigation';
+import { Routes, Route} from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
+
+import LeftSideNav from './components/LeftSideNav';
+import RightSideNav from './components/RightSideNav';
 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
-import NewUser from './components/NewUser';
-import CreateTask from './components/CreateTasks';
-import TaskList from './components/TaskList';
-import TeacherHome from './components/TeacherHome';
-import StudentHome from './components/StudentHome';
-import Playground from './components/Playground';
 import ChatPage from './components/ChatPage';
-import Chat from './components/Chat';
-import ChatTest from './components/ChatTest';
+import FavModal from './components/Modal/FavModal';
+
+import { login } from './scripts/brightspace.js';
+
+/* userObject //BrightSpace API whomai: {"Identifier":"1163","FirstName":"Zach","LastName":"Medendorp","Pronouns":null,"UniqueName":"zmedendorp@branksome.on.ca","ProfileIdentifier":"FhoF5s161j"}
+    ID:
+    firstName:
+    lastName:
+    email:
+    roleID:
+    favPrompts: [...promptIDs]
+  */
+const userObject = {
+  ID: null,
+  firstName: "",
+  lastName: "",
+  email: "",
+  roleID: null,
+  favPrompts: [],
+};
 
 function App() {
+  const [user, setUser] = useState(userObject);
+  const [prompt, setPrompt] = useState("");
+  const [showFav, setShowFav] = useState(false);
+  const navigate = useNavigate();
 
-  const [ user, setUser ] = useState(null);
-  const [ profile, setProfile ] = useState(null);
-
- //Check if user has a persistent login in localStorage
-  useEffect(() => {
-    const persistentLogin = localStorage.getItem('userCredential');
-    const persistentRole = localStorage.getItem('userRole');
-    //console.log(persistentLogin);
-    if (persistentLogin === "new") {
-      //Sign in again
+  useEffect(()=>{
+    if(!user.ID){
+      //window.open("https://localhost:5000/login",'_blank');
+      /*login().then((whoami) => {
+        setUser({...user,
+        ID: whoami.Identifier,
+        firstName: whoami.FirstName,
+        lastName: whoami.LastName,
+        email: whoami.UniqueName,
+        });
+        console.log(whoami);
+      }*/
     }
-    else if(persistentLogin){
-      setUser(persistentLogin);
-      let tempUser = jwt_decode(persistentLogin);
-      tempUser['role'] = persistentRole;
-      setProfile(tempUser);
-    }
-  },[]);
+  },[])
 
-  const callBackendAPI = async () => {
-    const response = await fetch('/express_backend');
-    const body = await response.json();
-
-    if (response.status !== 200) {
-      throw Error(body.message) 
-    }
-    console.log(body);
-    return body;
+  const handleResponse = (responseData) => {
+    setPrompt(responseData);
+    console.log(responseData);
   };
 
-  async function fetchData(){
-    const response = await fetch(`http://localhost:5000/users`)
-      .then(res => res.json())
-      .then(data => console.log(data));
-  }
-
-  function Profile(){
-    return(
-      <>
-        {profile && (
-          <div>
-              <img src={profile.picture} alt="user image" referrerPolicy="no-referrer"/>
-              <h3>User Logged in</h3>
-              <p>Name: {profile.name}</p>
-              <p>Email Address: {profile.email}</p>
-          </div>
-      )}
-    </>
-    )
-  }
-
-  function HomePage(){
-    if(profile.role === "Student"){
-      return <StudentHome/>
-    } else if (profile.role === "Teacher"){
-      return <TeacherHome/>
-    }else {
-      return (<>
-      <h1>Unknown Role</h1>
-      </>)
-    }
-  }
-
-  function Content(){
-    if(user){
-      if(user.substring(0,5) === "new: "){
-        return(<NewUser user={user} profile={profile} setUser={setUser} setProfile={setProfile}/>);
-      }
-      else{
-        return(
-          <Container>
-            <Row>
-              <Navigation profile={profile} setUser={setUser} setProfile={setProfile}/>
-            </Row>
-            <Row className='navSpacer'>
-              <Routes>
-                <Route exact path="/" element={<HomePage/>} />
-                <Route path="/CreateTask" exact element= {<CreateTask/>} />
-                <Route path="/TaskList" exact element={<TaskList/>}/>
-                <Route path="/Playground" exact element={<Playground/>}/>
-                <Route path="/ChatPage" exact element={<ChatTest/>}/>
-                <Route path="/Chat" exact element={<Chat/>}/>
-              </Routes>
-            </Row>
-          </Container>
-        );
-      }
-    }    
-    else{
-      return(<Signin setUser={setUser} setProfile={setProfile}/>);
-    }
-  }
-
-
-  return (
-    <div className="App">
-      <Content/>          
-    </div>
-  );
+      return(
+      <div className="App">      
+        <Container>
+          <LeftSideNav setShowFav={setShowFav}/>
+          <Row>          
+            <div>
+              <ChatPage/>
+            </div>
+          </Row>
+          <RightSideNav/>
+        </Container>
+        <FavModal showFav={showFav} setShowFav={setShowFav} handleResponse={handleResponse}/>                  
+      </div>
+      );
 }
 
 export default App;
