@@ -22,10 +22,10 @@ jobs:
         run: npm install
 
       - name: Upload artifact for deployment job
-      uses: actions/upload-artifact@v3
-      with:
-        name: node-server
-        path: .
+        uses: actions/upload-artifact@v3
+        with:
+          name: node-server
+          path: .
 
   deploy-server:
     runs-on: windows-latest
@@ -41,6 +41,3 @@ jobs:
       - name: Deploy server to Azure
         run: |
           node server.js
-       
-
- 
