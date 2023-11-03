@@ -7,7 +7,7 @@ const qs = require('qs');
 const app = express(); //Line 2
 const cors = require('cors');
 require("dotenv").config();
-console.log(process.env.CUSTOMCONNSTR_ATLAS_URI);
+console.log(process.env.ATLAS_URI);
 const port = process.env.PORT || 5000; 
 
 app.use(cors());
