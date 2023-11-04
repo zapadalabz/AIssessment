@@ -33,5 +33,5 @@ jobs:
         with:
           app-name: 'aifl'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_23FE7EC292A548E9B10EC6AFA651A382 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_6918F05F652246EA96BB42CDE2037BB4 }}
           package: .
