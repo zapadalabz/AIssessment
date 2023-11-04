@@ -13,6 +13,16 @@ app.use(express.json());
 app.use(require("./routes/record"));
 app.use(require("./routes/record_hf.js"));
 app.use(require("./routes/record_openAI.js"));
+
+app.listen(process.env.PORT||5000, async () => {
+  console.log(`Listening on port ${port}`);
+    await dbo.connectToServer(function (err) {
+        if (err) console.error(err);
+    });    
+    console.log(`Server is running on port: ${port}`);
+});
+
+
 console.log("before dbo");
 const dbo = require("./db/conn");
 console.log("after dbo");
@@ -21,15 +31,8 @@ console.log("after dbo");
 app.use(express.static(path.join(__dirname, 'client/build')));
 console.log("after static");
 // Handle React routing, return all requests to React app
-app.get('*', function(req, res) {
-  res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+app.get("/", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
 });
 console.log("after join");
 
-app.listen(port, async () => {
-  console.log(`Listening on port ${port}`);
-    await dbo.connectToServer(function (err) {
-        if (err) console.error(err);
-    });    
-    console.log(`Server is running on port: ${port}`);
-});

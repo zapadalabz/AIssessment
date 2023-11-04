@@ -1,14 +1,13 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
 name: Build and deploy Node.js app to Azure Web App - aifl
 
 on:
   push:
     branches:
       - main
-
-env:
-  AZURE_WEBAPP_NAME: 'aifl'                   # set this to your Azure WebApp name
-  AZURE_WEBAPP_PACKAGE_PATH: '.'              # set this to the path of your app's content
-  NODE_VERSION: '18.x'                        # set this to the Node.js version you are using
+  workflow_dispatch:
 
 jobs:
   build:
@@ -17,49 +16,22 @@ jobs:
       CI: false
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          node-version: '18.x'
 
-      # Cache server node_modules
-      - name: Cache server node_modules
-        id: cache-server
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-server-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-server-
+      - name: npm install, build
+        id: build-app
+        run: npm run build-prod
 
-      - name: Install server dependencies
-        run: npm install
-        working-directory: .
-
-      # Cache client node_modules
-      - name: Cache client node_modules
-        id: cache-client
-        uses: actions/cache@v2
-        with:
-          path: client/node_modules
-          key: ${{ runner.os }}-client-${{ hashFiles('**/client/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-client-
-
-      - name: Install and build client app
-        run: |
-          npm install
-          npm run build
-        working-directory: ./client
-
-      # Deploy to Azure Web App
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
+        id: deploy-to-webapp
         with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          app-name: 'aifl'
+          slot-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_23FE7EC292A548E9B10EC6AFA651A382 }}
+          package: .
