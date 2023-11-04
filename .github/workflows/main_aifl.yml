@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      CI: false
 
     steps:
       - name: Checkout code
@@ -24,9 +26,7 @@ jobs:
       - name: Install client dependencies
         run: npm install --prefix client
 
-      - name: Set CI environment variable
-        run: echo "CI=false" >> $GITHUB_ENV
-        
+
       - name: Build React app
         run: npm run build --prefix client
 
