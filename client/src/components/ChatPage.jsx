@@ -7,7 +7,6 @@ import MessageInput from "./Message/MessageInput/MessageInput";
 import Overlay from 'react-bootstrap/Overlay';
 import Stack from 'react-bootstrap/Stack';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileExcel } from "@fortawesome/free-solid-svg-icons/faFileExcel";
 import { faFilePdf } from "@fortawesome/free-solid-svg-icons/faFilePdf";
 
 export default function ChatPage() {

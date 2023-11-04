@@ -1,9 +1,5 @@
 import React from "react";
 import "../styles/sidenav.css"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGreaterThan } from "@fortawesome/free-solid-svg-icons/faGreaterThan";
-import { faLessThan } from "@fortawesome/free-solid-svg-icons/faLessThan";
-import FavModal from "./Modal/FavModal";
 
 const LeftSideNav = ({setShowFav, handleResponse}) => {
 

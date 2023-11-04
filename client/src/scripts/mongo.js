@@ -45,7 +45,8 @@ async function upsertUser(ID, userObject){
         headers: {
         'Content-Type': 'application/json'
         },
-    }); 
+    });
+    return response;
 }
 
 /*
@@ -89,7 +90,9 @@ async function addPrompt(promptObject){
         headers: {
         'Content-Type': 'application/json'
         },
-    }); 
+    });
+
+    return response;
 
 }
 
@@ -105,7 +108,9 @@ async function updatePrompt(promptObject){
         headers: {
         'Content-Type': 'application/json'
         },
-    }); 
+    });
+
+    return response;
 }
 
 //Update existing prompt with promptID(_id) /prompts/update

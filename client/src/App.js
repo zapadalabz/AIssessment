@@ -4,9 +4,6 @@ import './styles/chat.css';
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 
 import React, { useState, useEffect } from 'react';
-import jwt_decode from "jwt-decode";
-import { Routes, Route} from "react-router-dom";
-import { useNavigate } from 'react-router-dom';
 
 import LeftSideNav from './components/LeftSideNav';
 import RightSideNav from './components/RightSideNav';
@@ -16,7 +13,6 @@ import Row from 'react-bootstrap/Row';
 import ChatPage from './components/ChatPage';
 import FavModal from './components/Modal/FavModal';
 
-import { login } from './scripts/brightspace.js';
 
 /* userObject //BrightSpace API whomai: {"Identifier":"1163","FirstName":"Zach","LastName":"Medendorp","Pronouns":null,"UniqueName":"zmedendorp@branksome.on.ca","ProfileIdentifier":"FhoF5s161j"}
     ID:
@@ -26,6 +22,8 @@ import { login } from './scripts/brightspace.js';
     roleID:
     favPrompts: [...promptIDs]
   */
+ 
+ /*
 const userObject = {
   ID: null,
   firstName: "",
@@ -33,16 +31,14 @@ const userObject = {
   email: "",
   roleID: null,
   favPrompts: [],
-};
+};*/
 
 function App() {
-  const [user, setUser] = useState(userObject);
-  const [prompt, setPrompt] = useState("");
   const [showFav, setShowFav] = useState(false);
-  const navigate = useNavigate();
+
 
   useEffect(()=>{
-    if(!user.ID){
+    //if(!user.ID){
       //window.open("https://localhost:5000/login",'_blank');
       /*login().then((whoami) => {
         setUser({...user,
@@ -53,11 +49,11 @@ function App() {
         });
         console.log(whoami);
       }*/
-    }
+    //}
   },[])
 
   const handleResponse = (responseData) => {
-    setPrompt(responseData);
+    //setPrompt(responseData);
     console.log(responseData);
   };
 
