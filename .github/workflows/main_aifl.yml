@@ -28,6 +28,7 @@ jobs:
 
       # Cache server node_modules
       - name: Cache server node_modules
+        id: cache-server
         uses: actions/cache@v2
         with:
           path: node_modules
@@ -35,18 +36,25 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-server-
 
+      - name: Cache hit status (server)
+        run: echo "Cache hit: ${{ steps.cache-server.outputs.cache-hit }}"
+
       - name: Install server dependencies
         run: npm install
         working-directory: .
 
       # Cache client node_modules
       - name: Cache client node_modules
+        id: cache-client
         uses: actions/cache@v2
         with:
           path: client/node_modules
           key: ${{ runner.os }}-client-${{ hashFiles('**/client/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-client-
+
+      - name: Cache hit status (client)
+        run: echo "Cache hit: ${{ steps.cache-client.outputs.cache-hit }}"
 
       - name: Install and build client app
         run: |
