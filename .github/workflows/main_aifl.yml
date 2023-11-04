@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build-server:
+  build:
     runs-on: windows-latest
 
     steps:
@@ -21,22 +21,38 @@ jobs:
       - name: Install server dependencies
         run: npm install
 
+      - name: Install client dependencies
+        run: npm install --prefix client
+
+      - name: Build React app
+        run: npm run build --prefix client
+
+      - name: Move React build to server public directory
+        run: xcopy /E /I client\build server\public
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
-          name: node-server
+          name: node-app
           path: .
 
-  deploy-server:
+  deploy:
     runs-on: windows-latest
-    needs: build-server
+    needs: build
+    environment:
+      name: 'production' # or your environment name
+      url: ${{ steps.deploy-server.outputs.webapp-url }}
 
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v3
         with:
-          name: node-server
+          name: node-app
 
-      - name: Deploy server to Azure
-        run: |
-          node server.js
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'aifl' # Set your app name here
+          slot-name: 'production' # If you're using a deployment slot
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }} # Set your Azure publish profile secret here
+          package: .
