@@ -36,9 +36,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-server-
 
-      - name: Cache hit status (server)
-        run: echo "Cache hit: ${{ steps.cache-server.outputs.cache-hit }}"
-
       - name: Install server dependencies
         run: npm install
         working-directory: .
@@ -52,9 +49,6 @@ jobs:
           key: ${{ runner.os }}-client-${{ hashFiles('**/client/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-client-
-
-      - name: Cache hit status (client)
-        run: echo "Cache hit: ${{ steps.cache-client.outputs.cache-hit }}"
 
       - name: Install and build client app
         run: |
