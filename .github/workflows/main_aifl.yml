@@ -5,6 +5,11 @@ on:
     branches:
       - main
 
+env:
+  AZURE_WEBAPP_NAME: 'aifl'                   # set this to your Azure WebApp name
+  AZURE_WEBAPP_PACKAGE_PATH: '.'              # set this to the path of your app's content
+  NODE_VERSION: '18.x'                        # set this to the Node.js version you are using
+
 jobs:
   build:
     runs-on: windows-latest
@@ -18,44 +23,41 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      # Cache server node_modules
+      - name: Cache server node_modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-server-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-server-
 
       - name: Install server dependencies
         run: npm install
+        working-directory: .
 
-      - name: Install client dependencies
-        run: npm install --prefix client
-
-
-      - name: Build React app
-        run: npm run build --prefix client
-
-      - name: Move React build to server public directory
-        run: xcopy /E /I client\build server\public
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
+      # Cache client node_modules
+      - name: Cache client node_modules
+        uses: actions/cache@v2
         with:
-          name: node-app
-          path: .
+          path: client/node_modules
+          key: ${{ runner.os }}-client-${{ hashFiles('**/client/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-client-
 
-  deploy:
-    runs-on: windows-latest
-    needs: build
-    environment:
-      name: 'production' # or your environment name
-      url: ${{ steps.deploy-server.outputs.webapp-url }}
+      - name: Install and build client app
+        run: |
+          npm install
+          npm run build
+        working-directory: ./client
 
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: node-app
-
-      - name: Deploy to Azure Web App
+      # Deploy to Azure Web App
+      - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'aifl' # Set your app name here
-          slot-name: 'production' # If you're using a deployment slot
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }} # Set your Azure publish profile secret here
-          package: .
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
