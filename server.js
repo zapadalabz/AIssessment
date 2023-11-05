@@ -14,18 +14,18 @@ app.use(require("./routes/record"));
 app.use(require("./routes/record_hf.js"));
 app.use(require("./routes/record_openAI.js"));
 
+console.log("before dbo");
+//const dbo = require("./db/conn");
+console.log("after dbo");
+
 app.listen(process.env.PORT||5000, async () => {
   console.log(`Listening on port ${port}`);
-    await dbo.connectToServer(function (err) {
+    /*await dbo.connectToServer(function (err) {
         if (err) console.error(err);
-    });    
-    console.log(`Server is running on port: ${port}`);
+    });    */
+  console.log(`Server is running on port: ${port}`);
 });
 
-
-console.log("before dbo");
-const dbo = require("./db/conn");
-console.log("after dbo");
 
 // Serve any static files
 app.use(express.static(path.join(__dirname, 'client/build')));
